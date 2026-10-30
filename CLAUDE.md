@@ -4,7 +4,7 @@ Fork of [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterT
 
 ## Remotes
 - `origin`: aliumar521/MoneyPrinterTurbo (public, because GitHub forks of public repos can't be made private)
-- `upstream`: harry0703/MoneyPrinterTurbo. Sync with `git fetch upstream && git merge upstream/main`. Keep our changes in files of our own (`docker-compose.oracle.yml`, this file) so merges stay clean.
+- `upstream`: harry0703/MoneyPrinterTurbo. Sync with `git fetch upstream && git merge upstream/main`. Keep our changes in files of our own (`docker-compose.oracle.yml`, this file) so merges stay clean. `Dockerfile.oracle` exists because upstream's `Dockerfile` uses a bullseye base that no longer builds on arm64. If upstream picks up a dependency that needs a system package, mirror the change there.
 
 ## Deployment
 - Server: oracle-hash (129.146.84.6), `~/moneyprinterturbo`, compose project `moneyprinterturbo`, built from `docker-compose.oracle.yml`.

@@ -1,0 +1,21 @@
+# Oracle Hash build (used by docker-compose.oracle.yml). Same as the upstream Dockerfile but on
+# bookworm: bullseye LTS ended in Aug 2026 and its arm64 security packages 404, so upstream's
+# python:3.11-slim-bullseye base no longer builds on the A1 (arm64) VM. Kept as a separate file so
+# upstream merges don't conflict.
+FROM python:3.11-slim-bookworm
+
+WORKDIR /MoneyPrinterTurbo
+RUN chmod 777 /MoneyPrinterTurbo
+ENV PYTHONPATH="/MoneyPrinterTurbo"
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt ./
+RUN pip install --no-cache-dir --retries 3 --timeout 60 -r requirements.txt
+
+COPY . .
+
+EXPOSE 8501
+CMD ["streamlit", "run", "./webui/Main.py", "--server.address=0.0.0.0", "--server.port=8501", "--browser.gatherUsageStats=False", "--client.toolbarMode=minimal", "--logger.hideWelcomeMessage=True", "--server.showEmailPrompt=False"]
