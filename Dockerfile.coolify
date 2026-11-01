@@ -10,15 +10,17 @@ ENV PYTHONPATH="/MoneyPrinterTurbo"
 # config.toml, storage/ (generated videos) and resource/ live here, on Coolify's persistent volume.
 ENV MPT_HOME=/data
 
-# curl: Coolify's health check runs inside the container.
+# curl: Coolify's health check runs inside the container. caddy: the login gate (coolify/Caddyfile).
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends git ffmpeg curl \
+    && apt-get install -y --no-install-recommends git ffmpeg curl caddy \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt ./
 RUN pip install --no-cache-dir --retries 3 --timeout 60 -r requirements.txt
 
 COPY . .
+RUN chmod +x coolify/start.sh
 
+# :8501 is Caddy (login via MPT_AUTH_USER / MPT_AUTH_PASSWORD); Streamlit listens on 127.0.0.1:8502.
 EXPOSE 8501
-CMD ["streamlit", "run", "./webui/Main.py", "--server.address=0.0.0.0", "--server.port=8501", "--browser.gatherUsageStats=False", "--client.toolbarMode=minimal", "--logger.hideWelcomeMessage=True", "--server.showEmailPrompt=False"]
+CMD ["./coolify/start.sh"]

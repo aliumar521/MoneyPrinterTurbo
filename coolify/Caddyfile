@@ -1,0 +1,20 @@
+# Login gate in front of the Streamlit WebUI (it has no login of its own and holds the API keys).
+# Credentials come from Coolify environment variables MPT_AUTH_USER / MPT_AUTH_PASSWORD;
+# coolify/start.sh hashes the password into MPT_AUTH_HASH before Caddy starts.
+{
+	admin off
+	auto_https off
+}
+
+:8501 {
+	# Unauthenticated health endpoint for Coolify's health check and the Skunkworks collector.
+	handle /_stcore/health {
+		reverse_proxy 127.0.0.1:8502
+	}
+	handle {
+		basicauth {
+			{$MPT_AUTH_USER} {$MPT_AUTH_HASH}
+		}
+		reverse_proxy 127.0.0.1:8502
+	}
+}
